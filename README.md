@@ -34,5 +34,6 @@
 | :---:         |     :---:      |          :---: |
 | **Check if bot is running** |  Everyone  | <br>**Wake up! @`Bot's name`** <br><br> |
 | **Start Korean Typing Exercise** |  Everyone  | <br>**@`Bot's name` typing<br><br>***- OR -***<br><br>!t**<br><br> |
+| **Start Korean Translating Exercise** |  Everyone  | <br>**@`Bot's name` translating<br><br>***- OR -***<br><br>!tr**<br><br> |
 | **Move all pinned messages to another channel**|  Moderators   | <br> **@`Bot's name` copy the pins here<br>@`Bot's name` paste the pins here** <br><br>  |
 | **Manually Unmute users** *(used for emergencies if user is stuck on mute)* |  Moderators  | <br>**Unmute @`User's name`<br>***(This unmutes a single user)***<br><br>***- OR -***<br><br>Unmute everyone @`Bot's name`<br>** *(This unmutes everyone)*<br><br>|

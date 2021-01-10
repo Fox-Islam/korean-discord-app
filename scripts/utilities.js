@@ -87,4 +87,20 @@ function logMessageDate() {
 	console.log(`\n\n${Date()}`);
 }
 
-module.exports = { ping, getPinned, movePinned, unPin50thMsg, getAllChannels, logMessageDate };
+function isExercisesChannel(channel) {
+	return channel.id === process.env.EXERCISES_CHANNEL;
+}
+
+function isTestChannel(channel) {
+	return channel.id === process.env.TEST_CHANNEL;
+}
+
+function isKoreanChannel(channel) {
+	return channel.id === process.env.KOREAN_CHANNEL;
+}
+
+function isLinksChannel(channel) {
+	return channel.id === process.env.LINKS_CHANNEL;
+}
+
+module.exports = { ping, getPinned, movePinned, unPin50thMsg, getAllChannels, logMessageDate, isExercisesChannel, isTestChannel, isKoreanChannel, isLinksChannel };

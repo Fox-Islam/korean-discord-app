@@ -11,8 +11,8 @@ const { koreanObserver } = require("./scripts/korean-channel");
 const { resourcesObserver } = require("./scripts/resource-channels");
 const { manualUnMute } = require("./scripts/users/permissions");
 const { regularQualifyCheck } = require("./scripts/users/user-utilities");
-const { unPin50thMsg, getAllChannels, logMessageDate, ping } = require("./scripts/utilities");
-const { typingGame, typingGameListener, endTypingGame, gameExplanation } = require("./scripts/activities/games");
+const { unPin50thMsg, getAllChannels, logMessageDate, ping, isKoreanChannel, isLinksChannel, isTestChannel } = require("./scripts/utilities");
+const { typingGame, typingGameListener, endTypingGame, translatingGame, translatingGameListener, endTranslatingGame, gameExplanation } = require("./scripts/activities/games");
 /* ------------------------------------------------------ */
 
 /* ________________ DECLARE MAIN VARIABLES ________________ */
@@ -20,6 +20,7 @@ const { typingGame, typingGameListener, endTypingGame, gameExplanation } = requi
 const client = new Discord.Client();
 const counter = {}; // Message counter object for users
 global.tgFirstRoundStarted = false; // Flag for Typing Game below
+global.translatingGameFirstRoundStarted = false; // Flag for Translating Game below
 /* -------------------------------------------------------- */
 
 /* ________________ INITIATING FUNCTION ________________ */
@@ -75,17 +76,29 @@ client.on("message", (message) => {
 
 	switch (true) {
 		// Start Typing Game
-		case (text.includes(process.env.CLIENT_ID) && text.includes("typing")) || text === "!t":
+		case (text.includes(process.env.CLIENT_ID) && (text.includes("typing")) || text.endsWith("!t")):
 			typingGame(message, client);
 			break;
 		// Stop Typing Game
-		case text.includes(process.env.CLIENT_ID) && text.includes("stop"):
+		case text.includes(process.env.CLIENT_ID) && text.includes("stop") && global.typingFlag === true:
 			wroteStopFlag = true;
 			endTypingGame(message, wroteStopFlag);
 			break;
 		// Pass Message to Listener (while exercise is in progress)
 		case global.typingFlag === true:
 			typingGameListener(message, client);
+			break;
+		// Start Translating Game
+		case (text.includes(process.env.CLIENT_ID) && (text.includes("translating")) || text.endsWith("!tr")):
+			translatingGame(message, client);
+			break;
+		// Stop Translating Game (only if it's being played)
+		case text.includes(process.env.CLIENT_ID) && text.includes("stop") && global.translatingFlag === true:
+			endTranslatingGame(message, true); 
+			break;
+		// Pass Message to Listener (while exercise is in progress)
+		case global.translatingFlag === true:
+			translatingGameListener(message, client);
 			break;
 	}
 
@@ -105,12 +118,12 @@ client.on("message", (message) => {
 
 	// Ensure long conversations in English aren't being had in Korean Channel
 	channel = message.channel;
-	if (channel.id === process.env.KOREAN_CHANNEL || channel.id === process.env.TEST_CHANNEL) {
+	if (isKoreanChannel(channel) || isTestChannel(channel)) {
 		koreanObserver(message, counter, client);
 	}
 
 	// Ensure long conversations aren't being had in Resource Channel
-	if (channel.id === process.env.LINKS_CHANNEL) {
+	if (isLinksChannel(channel)) {
 		resourcesObserver(message, counter, client);
 	}
 });

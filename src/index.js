@@ -19,7 +19,7 @@ const { regularQualifyCheck } = require("./scripts/users/user-utilities");
 const { isDm, handleDmReactionAdd } = require("./scripts/users/dm/dm");
 const { addBookmark, removeBookmark } = require("./scripts/users/dm/bookmarks");
 const { unPin50thMsg, getAllChannels, ping, isKoreanChannel, isLinksChannel } = require("./scripts/utilities");
-const { typingGame, typingGameListener, endTypingGame, translatingGame, translatingGameListener, endTranslatingGame, gameExplanation } = require("./scripts/activities/games");
+const { gameExplanation, shouldStartGame, startGame, endGame, gameIsRunning, gameListener } = require("./scripts/activities/games");
 const { createStudySession, getUpcomingStudySessions, cancelStudySessionFromCommand, cancelStudySessionFromDeletion, subscribeStudySession, unsubscribeStudySession, cancelConfirmationStudySession } = require("./scripts/activities/study-session");
 const { loadMessageReaction } = require("./utils/cache");
 const runScheduler = require("./scheduler").default;
@@ -95,38 +95,15 @@ client.on("message", (message) => {
 	}
 
 	// --- EXERCISES ---
-	let wroteStopFlag = false;
-
 	switch (true) {
-		/* ---- Commands listed first so listeners below don't take precedent ---- */
-		// Start Typing Game
-		case (text.includes(process.env.CLIENT_ID) && text.includes("typing")) || text === "!t" || text === "!ㅌ":
-			typingGame(message, client);
+		case shouldStartGame(message, client):
+			startGame(message);
 			break;
-		// Start Translating Game
-		case (text.includes(process.env.CLIENT_ID) && text.includes("translating")) || text === "!tr":
-			translatingGame(message, client);
-			break;
-		/* ------------------------------------------------ */
-
-		// Stop Typing Game
-		case text.includes(process.env.CLIENT_ID) && text.includes("stop") && global.typingFlag === true:
-			wroteStopFlag = true;
-			endTypingGame(message, wroteStopFlag);
-			break;
-
-		// Stop Translating Game (only if it's being played)
-		case text.includes(process.env.CLIENT_ID) && text.includes("stop") && global.translatingFlag === true:
-			endTranslatingGame(message, true);
-			break;
-
 		case text.includes(process.env.CLIENT_ID) && text.includes("stop"):
-			endTypingGame(message, true);
+			endGame(message, true);
 			break;
-
-		// Pass Message to Listener (while exercise is in progress)
-		case global.typingFlag === true:
-			typingGameListener(message, client);
+		case gameIsRunning():
+			gameListener(message);
 			break;
 
 		// Pass Message to Listener (while exercise is in progress)

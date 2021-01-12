@@ -73,6 +73,10 @@ function sendChallenge(message, definition) {
 
 function handleResponse(message) {
 	try {
+		if (message.content !== global.gameVariables.answer) {
+			handleIncorrectness(message);
+			return;
+		}
 		if (message.content === global.gameVariables.answer) {
 			global.gameVariables.roundCount = global.gameVariables.roundCount + 1;
 
@@ -120,6 +124,50 @@ function handleResponse(message) {
 		console.log(error);
 		return;
 	}
+}
+
+function handleIncorrectness(message) {
+	correctAnswer = global.gameVariables.answer;
+	content = message.content;
+
+	// Make an "is this korean" function in a utility file probably
+	koreanRegEx = /[\uac00-\ud7af]|[\u1100-\u11ff]|[\u3130-\u318f]|[\ua960-\ua97f]|[\ud7b0-\ud7ff]/g;
+	if (!koreanRegEx.test(content)) {
+		message.channel.send("Some sort of 'That's not Korean at all' message");
+		return;
+	}
+
+	searchVocabList = weeklyVocab[content] || vocabWords[content];
+	if (searchVocabList) {
+		message.channel.send("Some sort of 'Not quite! " + content + " means '*" + searchVocabList + "*'' message");
+		return;
+	}
+
+	formattedAnswer = '';
+	anyMatches = false;
+	correctAnswer.split('').forEach((character) => {
+		if (!content.includes(character)) {
+			// Make anything that doesn't match bold
+			formattedAnswer = formattedAnswer + '**' + character + '**';
+			return;
+		}
+
+		formattedAnswer = formattedAnswer + character;
+		anyMatches = true;
+	});
+	
+	if (anyMatches) {
+		// Remove any set of 4 consecutive asterisks since Discord parses '****' as italicised '**'
+		formattedAnswer = formattedAnswer.replace(/\*\*\*\*/g, "");
+		message.channel.send("Some sort of 'Close! It's " + formattedAnswer + "' message");
+		return;
+	}
+	
+	if (vocabWords[correctAnswer]) {
+		message.channel.send("Some sort of 'This was a review word, check the past vocab words' message with a link");
+		return;
+	}
+	message.channel.send("Some sort of 'Check the weekly vocab' message with a link");
 }
 
 module.exports = { setUp, startGame, handleResponse, IDENTIFIER };

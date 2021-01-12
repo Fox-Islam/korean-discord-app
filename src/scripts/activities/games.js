@@ -17,7 +17,8 @@ const GAMES = {
 	[TYPING_GAME_IDENTIFIER]: {
 		commands: {
 			long: "typing",
-			short: "!t"
+			short: "!t",
+			hangul: "!ㅌ"
 		},
 		setUp: setUpTypingGame,
 		startGame: startTypingGame,
@@ -41,11 +42,11 @@ function gameExplanation(message) {
 		clearTimeout(global.noResponseTimeout);
 
 		//Ignores messages from the bot unless it's a message signaling end of game
-		if (message.author.bot && !text.includes("wins")) {
+		if (message.author.bot && !message.content.includes("wins")) {
 			clearTimeout(global.explanationTimeout);
 			// Ignores typing game explanation message
 			// But sends explanation when game timeout runs out
-			if (!text.includes("!t")) {
+			if (!message.content.includes("!t")) {
 				global.noResponseTimeout = setTimeout(() => {
 					sendResponse(message);
 				}, 30000);
@@ -56,7 +57,7 @@ function gameExplanation(message) {
 		clearTimeout(global.explanationTimeout);
 		global.explanationTimeout = setTimeout(() => {
 			sendResponse(message);
-		}, 10000);
+		}, 25000);
 	}
 }
 /* ------------------------------------------------- */
@@ -65,8 +66,8 @@ function sendResponse(message) {
 	message.channel.send(
 		"...uhh,\n\nAhem... If you would like to start the typing exercise, " +
 		"you can type:\n\n<@!" + process.env.CLIENT_ID + "> `" + GAMES[TYPING_GAME_IDENTIFIER].commands.long +
-		"`\n- ***OR*** -\n`" + GAMES[TYPING_GAME_IDENTIFIER].commands.short +
-		"`\n\nIf you would like to start the translating exercise, " +
+		"`\n- ***OR*** -\n`" + GAMES[TYPING_GAME_IDENTIFIER].commands.short + "` or `" + GAMES[TYPING_GAME_IDENTIFIER].commands.hangul + "`" +
+		"\n\nIf you would like to start the translating exercise, " +
 		"you can type:\n\n<@!" + process.env.CLIENT_ID + "> `" + GAMES[TRANSLATING_GAME_IDENTIFIER].commands.long +
 		"`\n- ***OR*** -\n`" + GAMES[TRANSLATING_GAME_IDENTIFIER].commands.short + "`"
 	);
@@ -81,7 +82,7 @@ function shouldStartGame(message, client) {
 		sendWrongChannelMessage(client, message);
 		return false;
 	}
-	for (gameIdentifier in GAMES) {
+	for (let gameIdentifier in GAMES) {
 		if (containsCommandForGame(message.content, gameIdentifier)) {
 			return true;
 		}
@@ -110,8 +111,9 @@ function startGame(message) {
 		endGame(message);
 	}
 
-	setUpCurrentGame(message.content);
-	GAMES[global.currentGame].startGame(message);
+	setUpCurrentGame(message.content).then(() => {
+		GAMES[global.currentGame].startGame(message);
+	});
 }
 
 function gameIsRunning() {
@@ -141,13 +143,13 @@ function handleEndGameMessage(message, wroteStopFlag) {
 	}
 }
 
-function setUpCurrentGame(messageContent) {
+async function setUpCurrentGame(messageContent) {
 	setGame(messageContent);
-	GAMES[global.currentGame].setUp();
+	return await GAMES[global.currentGame].setUp();
 }
 
 function setGame(messageContent) {
-	for (gameIdentifier in GAMES) {
+	for (let gameIdentifier in GAMES) {
 		if (containsCommandForGame(messageContent, gameIdentifier)) {
 			global.currentGame = gameIdentifier;
 			return;

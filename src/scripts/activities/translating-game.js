@@ -1,8 +1,10 @@
 const GoogleSheets = require("../../connections/google-sheets-conn");
 
 const IDENTIFIER = "translatingGame";
+let weeklyVocab = {};
+let vocabWords = {};
 
-function setUp() {
+async function setUp() {
 	global.currentGame = IDENTIFIER;
 	global.gameVariables = {
 		roundCount: 0,
@@ -14,11 +16,13 @@ function setUp() {
 		answer: null,
 		winners: {}
 	}
+	vocabWords = await GoogleSheets.fetchVocab("Old Vocab!A2:B");
+	weeklyVocab = await GoogleSheets.fetchVocab("Weekly Vocab!A2:B");
 }
 
-function startGame(message) {
+async function startGame(message) {
 	try {
-		const { word, definition } = await getVocab(message);
+		const { word, definition } = getVocab(message);
 		global.gameVariables.answer = word;
 
 		if (global.gameVariables.roundCount === 0) {
@@ -49,11 +53,10 @@ function startGame(message) {
 }
 /* ------------------------------------------- */
 
-async function getVocab(message) {
+function getVocab(message) {
 	// Pulls random word from vocabWords
 	const oldOrNewVocab = Math.floor(Math.random() * 4); //Determines whether user gets old or new vocab
-	const range = oldOrNewVocab < 1 ? "Old Vocab!A2:B" : "Weekly Vocab!A2:B";
-	const vocabList = await GoogleSheets.fetchVocab(range);
+	const vocabList = oldOrNewVocab < 1 ? vocabWords : weeklyVocab;
 	if (!vocabList) {
 		message.channel.send("I couldn't get the vocab for some reason. Ugh, my makers are useless.\nMaybe we should try again?")
 		endTypingGame(message, false, true);
@@ -71,6 +74,10 @@ function sendChallenge(message, definition) {
 
 function handleResponse(message) {
 	try {
+		if (message.content !== global.gameVariables.answer) {
+			handleIncorrectness(message);
+			return;
+		}
 		if (message.content === global.gameVariables.answer) {
 			global.gameVariables.roundCount = global.gameVariables.roundCount + 1;
 
@@ -118,6 +125,50 @@ function handleResponse(message) {
 		console.log(error);
 		return;
 	}
+}
+
+function handleIncorrectness(message) {
+	const correctAnswer = global.gameVariables.answer;
+	const content = message.content;
+
+	// Make an "is this korean" function in a utility file probably
+	const koreanRegEx = /[\uac00-\ud7af]|[\u1100-\u11ff]|[\u3130-\u318f]|[\ua960-\ua97f]|[\ud7b0-\ud7ff]/g;
+	if (!koreanRegEx.test(content)) {
+		message.reply("That's not Korean at all!");
+		return;
+	}
+
+	const searchVocabList = weeklyVocab[content] || vocabWords[content];
+	if (searchVocabList) {
+		message.reply("Not quite! " + content + " means '*" + searchVocabList + "*'");
+		return;
+	}
+
+	let formattedAnswer = '';
+	let anyMatches = false;
+	correctAnswer.split('').forEach((character) => {
+		if (!content.includes(character)) {
+			// Make anything that doesn't match bold
+			formattedAnswer = formattedAnswer + '**' + character + '**';
+			return;
+		}
+
+		formattedAnswer = formattedAnswer + character;
+		anyMatches = true;
+	});
+
+	if (anyMatches) {
+		// Remove any set of 4 consecutive asterisks since Discord parses '****' as italicised '**'
+		formattedAnswer = formattedAnswer.replace(/\*\*\*\*/g, "");
+		message.reply("Close! It's " + formattedAnswer);
+		return;
+	}
+
+	if (vocabWords[correctAnswer]) {
+		message.reply("This was a review word, check the past vocab words!");
+		return;
+	}
+	message.reply("Not quite! Check out the weekly vocab");
 }
 
 module.exports = { setUp, startGame, handleResponse, IDENTIFIER };

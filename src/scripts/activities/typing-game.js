@@ -1,8 +1,10 @@
 const GoogleSheets = require("../../connections/google-sheets-conn");
 
 const IDENTIFIER = "typingGame";
+let weeklyVocab = {};
+let vocabWords = {};
 
-function setUp() {
+async function setUp() {
 	global.currentGame = IDENTIFIER;
 	global.gameVariables = {
 		roundCount: 0,
@@ -14,9 +16,11 @@ function setUp() {
 		answer: null,
 		winners: {}
 	}
+	vocabWords = await GoogleSheets.fetchVocab("Old Vocab!A2:B");
+	weeklyVocab = await GoogleSheets.fetchVocab("Weekly Vocab!A2:B");
 }
 
-function startGame(message) {
+async function startGame(message) {
 	try {
 		const { word, definition } = await getVocab(message);
 		global.gameVariables.answer = word;
@@ -37,10 +41,10 @@ function startGame(message) {
 
 			// Send Korean vocab word to chat
 			global.gameVariables.gameTimeout = setTimeout(() => {
-				sendChallenge(message, key, definition);
+				sendChallenge(message, word, definition);
 			}, 7200);
 		} else {
-			sendChallenge(message, key, definition);
+			sendChallenge(message, word, definition);
 		}
 	} catch (error) {
 		console.log(error);
@@ -51,8 +55,7 @@ function startGame(message) {
 async function getVocab(message) {
 	// Pulls random word from vocabWords
 	const oldOrNewVocab = Math.floor(Math.random() * 4); //Determines whether user gets old or new vocab
-	const range = oldOrNewVocab < 1 ? "Old Vocab!A2:B" : "Weekly Vocab!A2:B";
-	const vocabList = await GoogleSheets.fetchVocab(range);
+	const vocabList = oldOrNewVocab < 1 ? vocabWords : weeklyVocab;
 	if (!vocabList) {
 		message.channel.send("I couldn't get the vocab for some reason. Ugh, my makers are useless.\nMaybe we should try again?")
 		endTypingGame(message, false, true);
@@ -62,13 +65,13 @@ async function getVocab(message) {
 	return vocabList[seed];
 }
 
-function sendChallenge(message, key, definition) {
-	message.channel.send(`**${key}** - (${definition})`);
+function sendChallenge(message, word, definition) {
+	message.channel.send(`**${word}** - (${definition})`);
 	// 500 ms to approximately account for slight latency
 	global.gameVariables.startTime = Date.now() + 500;
 }
 
-function handleResponse(message, client) {
+function handleResponse(message) {
 	try {
 		if (message.content === global.gameVariables.answer) {
 			global.gameVariables.roundCount = global.gameVariables.roundCount + 1;

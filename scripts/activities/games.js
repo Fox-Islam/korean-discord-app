@@ -15,7 +15,7 @@ function typingGame(message, client) {
 
 		// Checks if waiting to receive input from users
 		if (typeof global.typingGame.listenerFlag === "undefined" || global.typingGame.listenerFlag) {
-			endTypingGame(message);
+			endTypingGame(message, false);
 		}
 
 		// Sets flag showing game is in play to true
@@ -23,7 +23,6 @@ function typingGame(message, client) {
 
 		/* Immediately sets listener flag to true at the start of each round */
 		global.typingGame.listenerFlag = true;
-		
 		wordList = getWordList();
 		key = getWordFromList(wordList);
 		definition = wordList[key];
@@ -211,12 +210,15 @@ function translatingGame(message, client) {
 		global.translatingGame = global.translatingGame || {};
 
 		// Checks if waiting to receive input from users
-		if (typeof global.translatingGame.listenerFlag === "undefined" || !global.translatingGame.listenerFlag) {
+		if (typeof global.translatingGame.listenerFlag === "undefined" || global.translatingGame.listenerFlag) {
 			endTypingGame(message, false);
 		}
 
 		// Sets flag showing game is in play to true
 		global.translatingFlag = true;
+
+		/* Immediately sets listener flag to true at the start of each round */
+		global.translatingGame.listenerFlag = true;
 
 		wordList = getWordList();
 		hangulWord = getWordFromList(wordList);
@@ -258,9 +260,10 @@ function translatingGame(message, client) {
 /* ------------------------------------------- */
 
 function translatingGameListener(message, client) {
-	global.translatingGame.listenerFlag = true;
 	try {
 		if (message.content === global.translatingGameAnswer) {
+			/* Sets listener flag to false when user gives the correct answer */
+			global.translatingGame.listenerFlag = false;
 			global.translatingGameAnswer = undefined;
 
 			// Creates round counter and increases count

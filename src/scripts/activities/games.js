@@ -41,11 +41,11 @@ function gameExplanation(message) {
 		clearTimeout(global.noResponseTimeout);
 
 		//Ignores messages from the bot unless it's a message signaling end of game
-		if (message.author.bot && !text.includes("wins")) {
+		if (message.author.bot && !message.content.includes("wins")) {
 			clearTimeout(global.explanationTimeout);
 			// Ignores typing game explanation message
 			// But sends explanation when game timeout runs out
-			if (!text.includes("!t")) {
+			if (!message.content.includes("!t")) {
 				global.noResponseTimeout = setTimeout(() => {
 					sendResponse(message);
 				}, 30000);
@@ -88,7 +88,7 @@ function shouldStartGame(message, client) {
 		sendWrongChannelMessage(client, message);
 		return false;
 	}
-	for (gameIdentifier in GAMES) {
+	for (let gameIdentifier in GAMES) {
 		if (containsCommandForGame(message.content, gameIdentifier)) {
 			return true;
 		}
@@ -154,7 +154,7 @@ function setUpCurrentGame(messageContent) {
 }
 
 function setGame(messageContent) {
-	for (gameIdentifier in GAMES) {
+	for (let gameIdentifier in GAMES) {
 		if (containsCommandForGame(messageContent, gameIdentifier)) {
 			global.currentGame = gameIdentifier;
 			return;

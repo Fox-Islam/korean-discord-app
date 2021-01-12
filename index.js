@@ -75,10 +75,17 @@ client.on("message", (message) => {
 	wroteStopFlag = false;
 
 	switch (true) {
+		/* ---- Commands listed first so listeners below don't take precedent ---- */
 		// Start Typing Game
-		case (text.includes(process.env.CLIENT_ID) && (text.includes("typing")) || text.endsWith("!t")):
+		case (text.includes(process.env.CLIENT_ID) && text.includes("typing")) || text.endsWith("!t"):
 			typingGame(message, client);
 			break;
+		// Start Translating Game
+		case (text.includes(process.env.CLIENT_ID) && text.includes("translating")) || text.endsWith("!tr"):
+			translatingGame(message, client);
+			break;
+		/* ------------------------------------------------ */
+
 		// Stop Typing Game
 		case text.includes(process.env.CLIENT_ID) && text.includes("stop") && global.typingFlag === true:
 			wroteStopFlag = true;
@@ -88,13 +95,10 @@ client.on("message", (message) => {
 		case global.typingFlag === true:
 			typingGameListener(message, client);
 			break;
-		// Start Translating Game
-		case (text.includes(process.env.CLIENT_ID) && (text.includes("translating")) || text.endsWith("!tr")):
-			translatingGame(message, client);
-			break;
+
 		// Stop Translating Game (only if it's being played)
 		case text.includes(process.env.CLIENT_ID) && text.includes("stop") && global.translatingFlag === true:
-			endTranslatingGame(message, true); 
+			endTranslatingGame(message, true);
 			break;
 		// Pass Message to Listener (while exercise is in progress)
 		case global.translatingFlag === true:

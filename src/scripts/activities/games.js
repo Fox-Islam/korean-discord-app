@@ -1,5 +1,5 @@
 const { weeklyVocab, vocabWords } = require("./dictionary");
-const { isExercisesChannel, isTestChannel } = require("../utilities");
+const { isExercisesChannel } = require("../utilities");
 const {
 	setUp: setUpTypingGame,
 	startGame: startTypingGame,
@@ -12,6 +12,12 @@ const {
 	handleResponse: handleResponseForTranslatingGame,
 	IDENTIFIER: TRANSLATING_GAME_IDENTIFIER
 } = require("./translating-game");
+const {
+	setUp: setUpListeningGame,
+	startGame: startListeningGame,
+	handleResponse: handleResponseForListeningGame,
+	IDENTIFIER: LISTENING_GAME_IDENTIFIER
+} = require("./listening-game");
 
 const GAMES = {
 	[TYPING_GAME_IDENTIFIER]: {
@@ -31,13 +37,22 @@ const GAMES = {
 		setUp: setUpTranslatingGame,
 		startGame: startTranslatingGame,
 		handleResponse: handleResponseForTranslatingGame
+	},
+	[LISTENING_GAME_IDENTIFIER]: {
+		commands: {
+			long: "listening",
+			short: "!l"
+		},
+		setUp: setUpListeningGame,
+		startGame: startListeningGame,
+		handleResponse: handleResponseForListeningGame
 	}
 }
 
 /* ___________________ Sends Game Explanation Message _________________ */
 function gameExplanation(message) {
 	// Sends typing game explanation
-	if (isExercisesChannel(message.channel) || isTestChannel(message.channel)) {
+	if (isExercisesChannel(message.channel)) {
 		clearTimeout(global.noResponseTimeout);
 
 		//Ignores messages from the bot unless it's a message signaling end of game
@@ -56,7 +71,7 @@ function gameExplanation(message) {
 		clearTimeout(global.explanationTimeout);
 		global.explanationTimeout = setTimeout(() => {
 			sendResponse(message);
-		}, 10000);
+		}, 30000);
 	}
 }
 /* ------------------------------------------------- */
@@ -68,7 +83,10 @@ function sendResponse(message) {
 		"`\n- ***OR*** -\n`" + GAMES[TYPING_GAME_IDENTIFIER].commands.short +
 		"`\n\nIf you would like to start the translating exercise, " +
 		"you can type:\n\n<@!" + process.env.CLIENT_ID + "> `" + GAMES[TRANSLATING_GAME_IDENTIFIER].commands.long +
-		"`\n- ***OR*** -\n`" + GAMES[TRANSLATING_GAME_IDENTIFIER].commands.short + "`"
+		"`\n- ***OR*** -\n`" + GAMES[TRANSLATING_GAME_IDENTIFIER].commands.short +
+		"`\n\nIf you would like to start the listening exercise, " +
+		"you can type:\n\n<@!" + process.env.CLIENT_ID + "> `" + GAMES[LISTENING_GAME_IDENTIFIER].commands.long +
+		"`\n- ***OR*** -\n`" + GAMES[LISTENING_GAME_IDENTIFIER].commands.short + "`"
 	);
 	if (gameIsRunning()) {
 		global.currentGame = null;
@@ -84,7 +102,7 @@ function getWordFromList(wordList) {
 }
 
 function shouldStartGame(message, client) {
-	if (!isExercisesChannel(message.channel) && !isTestChannel(message.channel)) {
+	if (!isExercisesChannel(message.channel)) {
 		sendWrongChannelMessage(client, message);
 		return false;
 	}

@@ -88,15 +88,6 @@ client.on("message", (message) => {
 		case gameIsRunning():
 			gameListener(message);
 			break;
-
-		// Stop Translating Game (only if it's being played)
-		case text.includes(process.env.CLIENT_ID) && text.includes("stop") && global.translatingFlag === true:
-			endTranslatingGame(message, true);
-			break;
-		// Pass Message to Listener (while exercise is in progress)
-		case global.translatingFlag === true:
-			translatingGameListener(message, client);
-			break;
 	}
 
 	// Filters Explicit Words

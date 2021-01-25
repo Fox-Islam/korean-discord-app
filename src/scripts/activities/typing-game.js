@@ -1,19 +1,27 @@
-const { weeklyVocab, vocabWords } = require("./dictionary");
+const { getWeeklyVocab, getVocabWords } = require("./dictionary");
 
 const IDENTIFIER = "typingGame";
+var vocabWords;
+var weeklyVocab;
 
-function setUp() {
-    global.currentGame = IDENTIFIER;
-    global.gameVariables = {
-        roundCount: 0,
-        gameTimeout: null,
-        startTime: null,
-        endTime: null,
-        elapsed: null,
-        fullTime: null,
-        answer: null,
-        winners: {}
-    }
+async function setUp() {
+	global.currentGame = IDENTIFIER;
+	global.gameVariables = {
+		roundCount: 0,
+		gameTimeout: null,
+		startTime: null,
+		endTime: null,
+		elapsed: null,
+		fullTime: null,
+		answer: null,
+		winners: {}
+	}
+	return getWeeklyVocab().then((res) => {
+		weeklyVocab = res;
+		return getVocabWords().then((res) => {
+			vocabWords = res;
+		});
+	});
 }
 
 function startGame(message) {
@@ -110,9 +118,9 @@ function handleResponse(message, client) {
 				setTimeout(() => message.channel.send(`You got through the entire thing in a total of **${fullTime}** seconds.`), 1500);
 				Object.keys(winners).forEach((winner) => {
 					setTimeout(() => message.channel.send(`${winner}: ${winners[winner]} wins`), 1600);
-                });
-                
-                // Clear the current game variable to trigger the endGame function
+				});
+
+				// Clear the current game variable to trigger the endGame function
 				global.currentGame = null;
 			}
 		}

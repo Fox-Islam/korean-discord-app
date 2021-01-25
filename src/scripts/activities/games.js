@@ -117,8 +117,9 @@ function startGame(message) {
 		endGame(message);
 	}
 
-	setUpCurrentGame(message.content);
-	GAMES[global.currentGame].startGame(message);
+	setUpCurrentGame(message.content).then(() => {
+		GAMES[global.currentGame].startGame(message);
+	});
 }
 
 function gameIsRunning() {
@@ -148,9 +149,9 @@ function handleEndGameMessage(message, wroteStopFlag) {
 	}
 }
 
-function setUpCurrentGame(messageContent) {
+async function setUpCurrentGame(messageContent) {
 	setGame(messageContent);
-	GAMES[global.currentGame].setUp();
+	return await GAMES[global.currentGame].setUp();
 }
 
 function setGame(messageContent) {

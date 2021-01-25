@@ -1,3 +1,9 @@
+const fs = require('fs');
+const { google } = require('googleapis');
+const SPREADSHEET_ID = '1D91HvWatjUco237bmL9-_Ccgqm4xL60JVq9ViYu-zTE';
+const WEEKLY_VOCAB_SHEET_NAME = 'Weekly Vocab';
+const REVIEW_VOCAB_SHEET_NAME = 'Vocab Words';
+
 const weeklyVocab = {
 	여권: "Passport",
 	비행기: "Airplane",
@@ -11,7 +17,7 @@ const weeklyVocab = {
 	신분증: "ID",
 };
 
-const vocabWords = {
+const vocabWordsFallback = {
 	나: "I / Me",
 	회사원: "Employee of a company",
 	너무: "Too / Very",
@@ -102,4 +108,63 @@ const vocabWords = {
 	녹색: "Green",
 };
 
-module.exports = { weeklyVocab, vocabWords };
+async function getWeeklyVocab() {
+	let request = getSpreadsheetData(WEEKLY_VOCAB_SHEET_NAME);
+	return request.then((responseData) => {
+		vocab = getVocabFromSpreadsheetData(responseData);
+		return vocab || weeklyVocabFallback;
+	}).catch((error) => {
+		console.log('The API returned an error: \n' + error);
+		return weeklyVocabFallback;
+	});
+}
+
+async function getSpreadsheetData(vocabSet) {
+	let client = getAuthorisedClient();
+	const sheets = google.sheets({ version: 'v4', auth: client });
+	const response = await sheets.spreadsheets.values.get({
+		spreadsheetId: SPREADSHEET_ID,
+		range: vocabSet,
+	});
+	return response.data;
+}
+
+function getAuthorisedClient() {
+	content = fs.readFileSync('./credentials.json', 'utf8');
+	return authorize(JSON.parse(content));
+}
+
+function authorize(credentials) {
+	const { client_email, private_key } = credentials;
+	return new google.auth.JWT(client_email, null, private_key, [
+		"https://www.googleapis.com/auth/spreadsheets",
+	]);
+}
+
+function getVocabFromSpreadsheetData(spreadsheetData) {
+	let rows = spreadsheetData.values;
+	if (rows.length) {
+		let vocab = {};
+		rows.map((row) => {
+			vocab[row[0]] = row[1];
+		});
+		return vocab;
+	}
+	console.log('No data found.');
+}
+
+async function getVocabWords() {
+	let request = getSpreadsheetData(REVIEW_VOCAB_SHEET_NAME);
+	return request.then((responseData) => {
+		vocab = getVocabFromSpreadsheetData(responseData);
+		return vocab || vocabWordsFallback;
+	}).catch((error) => {
+		console.log('The API returned an error: \n' + error);
+		return vocabWordsFallback;
+	});
+}
+
+module.exports = {
+	getWeeklyVocab,
+	getVocabWords
+}

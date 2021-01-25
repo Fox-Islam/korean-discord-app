@@ -8,7 +8,7 @@
 - **User Authorization**
   - Allows moderators to post multiple non-link messages in link channels without being warned/muted.
   - Prevents regular users from using moderator commands.
-  
+
 - **Expletive Filter**
   - Immediately filters messages that include expletives and replaces them with clean version of original messages.
 
@@ -25,7 +25,7 @@
   - Provides weekly vocabulary words to users to type in Korean and times how quickly they are able to type them out in Korean.
 
 - **Keep Pinned Messages Under 50**
-  - Automatically unpins oldest message when a channel reaches its 50 pin limit.  
+  - Automatically unpins oldest message when a channel reaches its 50 pin limit.
 
 - **Manage Study Session**
   - Create study sessions that other users can subscribe to.

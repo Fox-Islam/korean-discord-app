@@ -3,17 +3,17 @@ const { weeklyVocab, vocabWords } = require("./dictionary");
 const IDENTIFIER = "typingGame";
 
 function setUp() {
-    global.currentGame = IDENTIFIER;
-    global.gameVariables = {
-        roundCount: 0,
-        gameTimeout: null,
-        startTime: null,
-        endTime: null,
-        elapsed: null,
-        fullTime: null,
-        answer: null,
-        winners: {}
-    }
+	global.currentGame = IDENTIFIER;
+	global.gameVariables = {
+		roundCount: 0,
+		gameTimeout: null,
+		startTime: null,
+		endTime: null,
+		elapsed: null,
+		fullTime: null,
+		answer: null,
+		winners: {}
+	}
 }
 
 function startGame(message) {
@@ -110,9 +110,9 @@ function handleResponse(message, client) {
 				setTimeout(() => message.channel.send(`You got through the entire thing in a total of **${fullTime}** seconds.`), 1500);
 				Object.keys(winners).forEach((winner) => {
 					setTimeout(() => message.channel.send(`${winner}: ${winners[winner]} wins`), 1600);
-                });
-                
-                // Clear the current game variable to trigger the endGame function
+				});
+
+				// Clear the current game variable to trigger the endGame function
 				global.currentGame = null;
 			}
 		}

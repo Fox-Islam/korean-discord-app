@@ -1,3 +1,4 @@
+const Tesseract = require("tesseract.js");
 const { logMessageDate } = require("./utilities");
 
 // List of Expletives
@@ -15,7 +16,7 @@ const expletives = {
 	cunt: "phlomingous",
 	choad: "phlomoninom",
 	twat: "phlololonum",
-	wanker: "phlonominium",
+	wank: "phlonominium",
 	bich: "plinimal",
 	cock: "phloopdie",
 	slut: "phliminustrim",
@@ -28,7 +29,12 @@ const strictExpletives = {
 };
 
 // Expletive Filter
-function explicitWordFilter(message) {
+async function explicitWordFilter(message) {
+	if (await checkImage(message)) {
+		message.delete();
+		message.reply(`\nHey! \nI said no bad words, even in images! If you don't want to play nice, I'm taking my ball and going home!`);
+		return;
+	}
 	if (check(message)) {
 		logMessageDate();
 		message.delete();
@@ -36,6 +42,24 @@ function explicitWordFilter(message) {
 		console.log(`Edited ${message.content} to ${global.newMessage}`);
 		message.reply("\nHey! \nI said no bad words! If you don't want to play nice, I'm taking my ball and going home!");
 	}
+}
+
+async function checkImage(message) {
+	if (message.attachments.size === 0) {
+		return false;
+	}
+	let attachment = message.attachments.first();
+	if (attachment.url.indexOf(".png") === -1 && attachment.url.indexOf(".jpeg") === -1) {
+		return false;
+	}
+	return Tesseract.recognize(
+		attachment.url,
+		'eng'
+	).then(({ data: { text } }) => {
+		return check({
+			content: text.toLowerCase()
+		})
+	});
 }
 
 /* Checks if message has expletives */

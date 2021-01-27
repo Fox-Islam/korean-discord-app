@@ -11,6 +11,8 @@
   "dependencies": {
     "discord.js": "^12.5.1",
     "dotenv": "^8.2.0",
-    "mongoose": "^5.11.8"
+    "mongoose": "^5.11.8",
+    "opencollective-postinstall": "^2.0.3",
+    "tesseract.js": "^2.1.4"
   }
 }

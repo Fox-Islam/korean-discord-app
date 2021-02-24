@@ -3,17 +3,17 @@ const { weeklyVocab, vocabWords } = require("./dictionary");
 const IDENTIFIER = "translatingGame";
 
 function setUp() {
-    global.currentGame = IDENTIFIER;
-    global.gameVariables = {
-        roundCount: 0,
-        gameTimeout: null,
-        startTime: null,
-        endTime: null,
-        elapsed: null,
-        fullTime: null,
-        answer: null,
-        winners: {}
-    }
+	global.currentGame = IDENTIFIER;
+	global.gameVariables = {
+		roundCount: 0,
+		gameTimeout: null,
+		startTime: null,
+		endTime: null,
+		elapsed: null,
+		fullTime: null,
+		answer: null,
+		winners: {}
+	}
 }
 
 function startGame(message) {
@@ -116,7 +116,7 @@ function handleResponse(message) {
 				Object.keys(winners).forEach((winner) => {
 					setTimeout(() => message.channel.send(`${winner}: ${winners[winner]} wins`), 1600);
 				});
-                // Clear the current game variable to trigger the endGame function
+				// Clear the current game variable to trigger the endGame function
 				global.currentGame = null;
 			}
 		}
@@ -155,14 +155,12 @@ function handleIncorrectness(message) {
 		formattedAnswer = formattedAnswer + character;
 		anyMatches = true;
 	});
-	
 	if (anyMatches) {
 		// Remove any set of 4 consecutive asterisks since Discord parses '****' as italicised '**'
 		formattedAnswer = formattedAnswer.replace(/\*\*\*\*/g, "");
 		message.channel.send("Some sort of 'Close! It's " + formattedAnswer + "' message");
 		return;
 	}
-	
 	if (vocabWords[correctAnswer]) {
 		message.channel.send("Some sort of 'This was a review word, check the past vocab words' message with a link");
 		return;

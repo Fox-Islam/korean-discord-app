@@ -1,6 +1,6 @@
 const { weeklyVocab, vocabWords } = require("./dictionary");
 
-const IDENTIFIER = "typingGame";
+const IDENTIFIER = "listeningGame";
 
 function setUp() {
 	global.currentGame = IDENTIFIER;
@@ -19,36 +19,36 @@ function setUp() {
 function startGame(message) {
 	try {
 		const wordList = getWordList();
-		const key = getWordFromList(wordList);
-		const definition = wordList[key];
-		global.gameVariables.answer = key;
+		const hangulWord = getWordFromList(wordList);
+		global.gameVariables.answer = hangulWord;
 
 		if (global.gameVariables.roundCount === 0) {
-			setTimeout(() => message.channel.send(`So you're professor fasty fast. :smirk:\nWell let's see you type this word in Korean then!`), 1000);
+			setTimeout(() => message.channel.send(`So you're professor fasty fast. :smirk:\nWell let's see you type this in Korean then!`), 1000);
 			setTimeout(
 				() =>
-					message.channel.send("I'll give you the first word in **5**").then((msg) => {
-						setTimeout(() => msg.edit("I'll give you the first word in **4**"), 1000);
-						setTimeout(() => msg.edit("I'll give you the first word in **3**"), 2000);
-						setTimeout(() => msg.edit("I'll give you the first word in **2**"), 3000);
-						setTimeout(() => msg.edit("I'll give you the first word in **1**"), 4000);
-						setTimeout(() => msg.edit("Quick, type the **Korean** word below!"), 5000);
+					message.channel.send("I'll give you the first challenge in **5**").then((msg) => {
+						setTimeout(() => msg.edit("I'll give you the first challenge in **4**"), 1000);
+						setTimeout(() => msg.edit("I'll give you the first challenge in **3**"), 2000);
+						setTimeout(() => msg.edit("I'll give you the first challenge in **2**"), 3000);
+						setTimeout(() => msg.edit("I'll give you the first challenge in **1**"), 4000);
+						setTimeout(() => msg.edit("Quick, write this **Korean** word below!"), 5000);
 					}),
 				2000
 			);
 
 			// Send Korean vocab word to chat
 			global.gameVariables.gameTimeout = setTimeout(() => {
-				sendChallenge(message, key, definition);
+				sendChallenge(message);
 			}, 7200);
 		} else {
-			sendChallenge(message, key, definition);
+			sendChallenge(message);
 		}
 	} catch (error) {
 		console.log(error);
 		return;
 	}
 }
+/* ------------------------------------------- */
 
 function getWordList() {
 	const chanceOfGettingOldWord = 0.25;
@@ -64,14 +64,28 @@ function getWordFromList(wordList) {
 	return Object.keys(wordList)[seed];
 }
 
-function sendChallenge(message, key, definition) {
-	message.channel.send(`**${key}** - (${definition})`);
+function sendChallenge(message) {
+	// All of these sound clips were lifted from https://ttsmp3.com/text-to-speech/Korean/
+	// They (and other TTS services) have an API service which I thought would be a bit better
+	// than downloading all of the files, but it seems to be a premium feature everywhere
+
+	// I'd like to migrate all of these files to Google Drive and leverage that
+	// so that we can make adding weekly vocab more collaborative, but I'll wait until
+	// my "externalise dictionary" branch has been merged (or wait until this has been merged
+	// and update that branch) to see if it's possible
+	message.channel.send('', {
+		files: ['./src/scripts/activities/audio-files/' + global.gameVariables.answer + '.mp3']
+	});
 	// 500 ms to approximately account for slight latency
 	global.gameVariables.startTime = Date.now() + 500;
 }
 
-function handleResponse(message, client) {
+function handleResponse(message) {
 	try {
+		if (message.content !== global.gameVariables.answer) {
+			handleIncorrectness(message);
+			return;
+		}
 		if (message.content === global.gameVariables.answer) {
 			global.gameVariables.roundCount = global.gameVariables.roundCount + 1;
 
@@ -97,7 +111,7 @@ function handleResponse(message, client) {
 							setTimeout(() => msg.edit(`Round ${global.gameVariables.roundCount + 1} starts in **3**`), 2000);
 							setTimeout(() => msg.edit(`Round ${global.gameVariables.roundCount + 1} starts in **2**`), 3000);
 							setTimeout(() => msg.edit(`Round ${global.gameVariables.roundCount + 1} starts in **1**`), 4000);
-							setTimeout(() => msg.edit("Quick, type the Korean word below!"), 5000);
+							setTimeout(() => msg.edit("Quick, write this **Korean** word below!"), 5000);
 							setTimeout(() => startGame(message), 5000);
 						}),
 					1000
@@ -111,7 +125,6 @@ function handleResponse(message, client) {
 				Object.keys(winners).forEach((winner) => {
 					setTimeout(() => message.channel.send(`${winner}: ${winners[winner]} wins`), 1600);
 				});
-
 				// Clear the current game variable to trigger the endGame function
 				global.currentGame = null;
 			}
@@ -120,6 +133,50 @@ function handleResponse(message, client) {
 		console.log(error);
 		return;
 	}
+}
+
+function handleIncorrectness(message) {
+	const correctAnswer = global.gameVariables.answer;
+	const content = message.content;
+
+	// Make an "is this korean" function in a utility file probably
+	const koreanRegEx = /[\uac00-\ud7af]|[\u1100-\u11ff]|[\u3130-\u318f]|[\ua960-\ua97f]|[\ud7b0-\ud7ff]/g;
+	if (!koreanRegEx.test(content)) {
+		message.channel.send("Some sort of 'That's not Korean at all' message");
+		return;
+	}
+
+	const searchVocabList = weeklyVocab[content] || vocabWords[content];
+	if (searchVocabList) {
+		message.channel.send("Some sort of 'Not quite! " + content + " means '*" + searchVocabList + "*'' message");
+		return;
+	}
+
+	const formattedAnswer = '';
+	const anyMatches = false;
+	correctAnswer.split('').forEach((character) => {
+		if (!content.includes(character)) {
+			// Make anything that doesn't match bold
+			formattedAnswer = formattedAnswer + '**' + character + '**';
+			return;
+		}
+
+		formattedAnswer = formattedAnswer + character;
+		anyMatches = true;
+	});
+
+	if (anyMatches) {
+		// Remove any set of 4 consecutive asterisks since Discord parses '****' as italicised '**'
+		formattedAnswer = formattedAnswer.replace(/\*\*\*\*/g, "");
+		message.channel.send("Some sort of 'Close! It's " + formattedAnswer + "' message");
+		return;
+	}
+
+	if (vocabWords[correctAnswer]) {
+		message.channel.send("Some sort of 'This was a review word, check the past vocab words' message with a link");
+		return;
+	}
+	message.channel.send("Some sort of 'Check the weekly vocab' message with a link");
 }
 
 module.exports = { setUp, startGame, handleResponse, IDENTIFIER };

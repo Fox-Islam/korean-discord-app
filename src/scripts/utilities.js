@@ -14,7 +14,7 @@ function ping(message) {
 	setTimeout(() => {
 		message
 			.reply(" what do you want?")
-			.then(() => {})
+			.then(() => { })
 			.catch(console.error);
 		message.channel.stopTyping();
 	}, 7000);

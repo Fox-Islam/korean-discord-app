@@ -14,9 +14,11 @@
   "author": "Chris McDonald",
   "license": "ISC",
   "dependencies": {
+    "@discordjs/opus": "^0.5.0",
     "discord.js": "^12.5.1",
     "dotenv": "^8.2.0",
     "googleapis": "^39.2.0",
+    "microsoft-cognitiveservices-speech-sdk": "^1.17.0",
     "mongoose": "^5.11.8",
     "node-cron": "^2.0.3"
   },

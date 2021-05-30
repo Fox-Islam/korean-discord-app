@@ -12,6 +12,13 @@ const {
 	handleResponse: handleResponseForTranslatingGame,
 	IDENTIFIER: TRANSLATING_GAME_IDENTIFIER
 } = require("./translating-game");
+const {
+	setUp: setUpReadingGame,
+	startGame: startReadingGame,
+	handleResponse: handleResponseForReadingGame,
+	IDENTIFIER: READING_GAME_IDENTIFIER,
+	endGame: handleEndForReadingGame
+} = require("./reading-game");
 
 const GAMES = {
 	[TYPING_GAME_IDENTIFIER]: {
@@ -32,6 +39,16 @@ const GAMES = {
 		setUp: setUpTranslatingGame,
 		startGame: startTranslatingGame,
 		handleResponse: handleResponseForTranslatingGame
+	},
+	[READING_GAME_IDENTIFIER]: {
+		commands: {
+			long: "reading",
+			short: "!r"
+		},
+		setUp: setUpReadingGame,
+		startGame: startReadingGame,
+		handleResponse: handleResponseForReadingGame,
+		endGame: handleEndForReadingGame
 	}
 }
 
@@ -63,16 +80,15 @@ function gameExplanation(message) {
 /* ------------------------------------------------- */
 
 function sendResponse(message) {
-	message.channel.send(
-		"...uhh,\n\nAhem... If you would like to start the typing exercise, " +
-		"you can type:\n\n<@!" + process.env.CLIENT_ID + "> `" + GAMES[TYPING_GAME_IDENTIFIER].commands.long +
-		"`\n- ***OR*** -\n`" + GAMES[TYPING_GAME_IDENTIFIER].commands.short + "` or `" + GAMES[TYPING_GAME_IDENTIFIER].commands.hangul + "`" +
-		"\n\nIf you would like to start the translating exercise, " +
-		"you can type:\n\n<@!" + process.env.CLIENT_ID + "> `" + GAMES[TRANSLATING_GAME_IDENTIFIER].commands.long +
-		"`\n- ***OR*** -\n`" + GAMES[TRANSLATING_GAME_IDENTIFIER].commands.short + "`"
-	);
+	// message.channel.send(
+	// 	"...uhh,\n\nAhem... If you would like to start the typing exercise, " +
+	// 	"you can type:\n\n<@!" + process.env.CLIENT_ID + "> `" + GAMES[TYPING_GAME_IDENTIFIER].commands.long +
+	// 	"`\n- ***OR*** -\n`" + GAMES[TYPING_GAME_IDENTIFIER].commands.short + "` or `" + GAMES[TYPING_GAME_IDENTIFIER].commands.hangul + "`" +
+	// 	"\n\nIf you would like to start the translating exercise, " +
+	// 	"you can type:\n\n<@!" + process.env.CLIENT_ID + "> `" + GAMES[TRANSLATING_GAME_IDENTIFIER].commands.long +
+	// 	"`\n- ***OR*** -\n`" + GAMES[TRANSLATING_GAME_IDENTIFIER].commands.short + "`"
+	// );
 	if (gameIsRunning()) {
-		global.currentGame = null;
 		endGame(message);
 	}
 }
@@ -92,7 +108,7 @@ function shouldStartGame(message, client) {
 
 function sendWrongChannelMessage(client, message) {
 	client.channels.fetch(process.env.EXERCISES_CHANNEL).then((exerciseChannel) => {
-		message.reply(`Psst...I think you meant to send this in the ${exerciseChannel} channel.\nBut don't worry, no one noticed!`);
+		// message.reply(`Psst...I think you meant to send this in the ${exerciseChannel} channel.\nBut don't worry, no one noticed!`);
 	});
 }
 
@@ -122,9 +138,10 @@ function gameIsRunning() {
 
 function endGame(message, wroteStopFlag) {
 	handleEndGameMessage(message, wroteStopFlag);
-	clearTimeout(global.gameVariables.gameTimeout);
-	global.currentGame = null;
-	global.gameVariables = {};
+	if (GAMES[global.currentGame] && GAMES[global.currentGame].endGame) {
+		GAMES[global.currentGame].endGame();
+	}
+	// clearTimeout(global.gameVariables.gameTimeout);
 }
 
 function handleEndGameMessage(message, wroteStopFlag) {
@@ -159,10 +176,6 @@ function setGame(messageContent) {
 
 function gameListener(message) {
 	GAMES[global.currentGame].handleResponse(message);
-	if (!gameIsRunning()) {
-		// If the last round has finished for a game, the currentGame variable is nulled
-		endGame(message, false);
-	}
 }
 
 module.exports = { gameExplanation, shouldStartGame, startGame, endGame, gameIsRunning, gameListener };

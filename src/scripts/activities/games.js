@@ -1,9 +1,11 @@
 const { isExercisesChannel } = require("./../utilities");
 
 const typingGame = require("./typing-game");
+const numberGame = require("./number-game");
 
 const GAMES = {
-	[typingGame.gameName]: typingGame
+	[typingGame.gameName]: typingGame,
+	[numberGame.gameName]: numberGame
 }
 
 let noResponseTimeout = null;
@@ -77,7 +79,14 @@ function containsCommandForGame(messageContent, gameName) {
 	if (messageContent.endsWith(GAMES[gameName].commands.short)) {
 		return true;
 	}
+	if (containsShortCommandAndOptions(messageContent, gameName)) {
+		return true;
+	}
 	return false;
+}
+
+function containsShortCommandAndOptions(messageContent, gameName) {
+	return messageContent.split(' ')[0] === GAMES[gameName].commands.short;
 }
 
 function startGame(message) {
@@ -121,7 +130,7 @@ function handleEndGameMessage(message, wroteStopFlag) {
 
 async function setUpCurrentGame(messageContent) {
 	setGame(messageContent);
-	return await GAMES[currentGame].setUp();
+	return await GAMES[currentGame].setUp(messageContent);
 }
 
 function setGame(messageContent) {

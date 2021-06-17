@@ -114,13 +114,21 @@ function handleHelpCommand(message) {
 		handleHelpStudyCommand(message);
 		return;
 	}
+	if (message.content.startsWith('!help number')) {
+		handleHelpNumberCommand(message);
+		return;
+	}
 	message.channel.send(null, {
 		embed: {
 			title: "Little LyonHeart ♡ features",
 			fields: [
 				{
 					name: 'Exercises',
-					value: `From within <#${process.env.EXERCISES_CHANNEL}> use \`!t\` or \`!ㅌ\` to start an exercise to help improve your typing abilities`
+					value: `
+From within <#${process.env.EXERCISES_CHANNEL}>:
+Use \`!t\` or \`!ㅌ\` to start an exercise to help improve your typing abilities
+
+Use \`!n\` to start an exercise to practise writing numbers in Korean. Use \`!help number\` for additional options`
 				},
 				{
 					name: 'Study Sessions',
@@ -261,6 +269,41 @@ Results in the bot creating a study session and responding with a message that l
 			image: {
 				url: 'https://i.imgur.com/SczgdyX.png'
 			}
+		}
+	});
+}
+
+function handleHelpNumberCommand(message) {
+	message.channel.send(null, {
+		embed: {
+			title: "The !n command",
+			fields: [
+				{
+					name: 'Description',
+					value: 'The `!n` command can be used to start a Korean number exercise'
+				}, {
+					name: 'Format',
+					value: `
+To practise only native korean numbers from 1-10 only \`!n\` is required
+
+To practise Sino-Korean numbers, add \`sk\` or \`sino\`
+
+To practise between a specific range add \`{minimumNumber}-{maximumNumber}\` (maximumNumber must be less than 100 for native Korean numbers)
+					`
+				}, {
+					name: 'Example',
+					value: `
+You can start an exercise for native Korean numbers between 1 and 10 (the default settings) using
+\`\`\`
+!n
+\`\`\`
+You can start an exercise for Sino Korean numbers between 10 and 30 using
+\`\`\`
+!n sk 10-30
+\`\`\`
+					`
+				}
+			]
 		}
 	});
 }

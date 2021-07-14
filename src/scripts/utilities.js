@@ -92,6 +92,10 @@ function logMessageDate() {
 }
 
 function handleHelpCommand(message) {
+	if (message.content.startsWith('!help role message')) {
+		handleHelpRoleMessageCommand(message);
+		return;
+	}
 	if (message.content.startsWith('!help timezone')) {
 		handleHelpTimezoneCommand(message);
 		return;
@@ -137,6 +141,13 @@ A copy of any message can be sent to you via direct message by the bot if you ap
 If you remove your bookmark, the DM you received is removed
 
 Any message the bot sends via DM can be deleted by applying an 'x' (❌) reaction to it
+					`
+				}, {
+					name: 'Roles',
+					value: `
+Moderators can create a self-assigned role message using the \`!role message\` command
+
+Use \`!help role message\` for more information
 					`
 				}, {
 					name: 'Help',
@@ -250,6 +261,54 @@ Results in the bot creating a study session and responding with a message that l
 			],
 			image: {
 				url: 'https://i.imgur.com/SczgdyX.png'
+			}
+		}
+	});
+}
+
+function handleHelpRoleMessageCommand(message) {
+	message.channel.send(null, {
+		embed: {
+			title: "The !role message command",
+			fields: [
+				{
+					name: 'Description',
+					value: 'The `!role message` command can be used to create self-assigned role selection menus'
+				}, {
+					name: 'Format',
+					value: `
+The role message command requires
+- a title placed on the first line (beside the \`!role message\` command)
+- at least one role option in the format: \`emoji: roleId - description\`
+
+Each role goes on its own line
+The emojis should be from the standard set (no custom emojis)
+The description has a 50 character limit
+
+Besides these rules, the message can have any additional information or formatting added
+					`
+				}, {
+					name: 'Example',
+					value: `
+Sending a message like this:
+\`\`\`
+!role message Alphabet roles
+
+Here's some information
+
+:boom:: 819317488923049987 - For people who want to have role A
+This role gives you access to #test-a
+:knife:: 819317563841314816 - For people who want to have role B
+This role gives you access to #test-b
+
+Here's some more information. Here's \_some\_ \*\*formatting\*\*
+\`\`\`
+Results in the bot responding with a message that looks like this:
+					`
+				}
+			],
+			image: {
+				url: 'https://i.imgur.com/Mjp3pVU.png'
 			}
 		}
 	});

@@ -1,6 +1,5 @@
 ### KEYS ###
 .env
-google-sheets.json
 
 .idea
 /node_modules

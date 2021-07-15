@@ -108,6 +108,7 @@ function handleHelpCommand(message) {
 		handleHelpStudyCommand(message);
 		return;
 	}
+
 	message.channel.send(null, {
 		embed: {
 			title: "Little LyonHeart ♡ features",

@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "korean-discord-vocab-sheets",
+  "private_key_id": "833b774d77cd6e9d05b1c1b5f03c214f515523a0",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQCqPKj6+r7zLk73\nSllK7j1vnVxyg/UWGPu1HXtiXGQkGb5R7z8oeOgZHc0SM+COxqbgnfNrwJOCg/2c\nH3xV/R0sVgtC6dCCJKUcutvK/uhtaHSv0jI+1DYegmHilwvqphhtZpn2CWmUrK2D\ny5MSOzXtSjoxzKCry3BX+QTk9CL4PlwMCX093xmXDcZ1RzlQdvVjbqSjJtpIja0t\nNlAh2vB8LGwhDK43nHoH76lrLRtE6EtovDB/ecWuRHfb11nZ+8+qpVM5Q2aQzsuG\nXvHn6nlTO7vK6rK4O+EiG2c3iLmepwAD1YyRAGsST9xhkdwILouSTxJxn9th4UGb\nvLuqd6uJAgMBAAECggEAPjU5eLFdSsb+0y3nkFKbv6gsyqn+ywrpHAeAeXKSo4CG\nxDEdjsAT7G2v7PlpEzNzcrw1Ygg2vyhVahI1YMTEPtnYdqSzbYNPlL6Rp83biHN1\nxHQWqU/p0N9LPr58e8wjPAMUusw4uTwakgE3pp9ddu87ccw5YF3QmU0lpTazeqvR\n+Kj5KXungS5eDcQbZLKkHlFaGQUGM0MpxIcV6VCxtRdTKb0EcNp1PYALb8Z8h5tl\nu0DyRGusO2Bh/Qwi9cWEzUDv2Uvxb76Dp9h0ObALv9Q+J9gCRTRenCZpk+BuV4AX\nl0Z3vnWrNQxYwBKo2Z6CV3q/HcfhuFQQhgtr0p+/uwKBgQDhZrtP5X+HYHru8zZD\n1ub/7RnlydLot7nQ1/lv/KkXoMpFxecWH9RvXFv+jszZa4W0HJxaRr8Qck5TARe5\nILhBKpUMLsSDjYoGnFjLRlJJyl8XQq9CMkF99BY1vnuvLfPhZD33J0Um0zK9dBl/\n3pY7cnmzzuyUvlCMPTYehjZsRwKBgQDBWNPC/UzDTpQXClHPnqTq8w7C9eDns5YX\nKUHJwGrWpuAu0lAJB6r8gGi+dk/+vSN8lRmzZBTnuzxt938087sdHjgVoZL1mDqS\nh7tgWSXrealOWKansgoEgc992NRnqN/P16nv/1w1HlFFrwMCpmyhXY9FhSCliJ0d\nhw+4Wf2hrwKBgQCY54Hl3z+17GM4udB0ENK/hm5tDY5/xDLPU9OofnOOzcqprmjm\n/0yzBqp5cxHP5DrdRhNiwl9WntQ3RqR7N5EG1AYsL4Wr4FZjyagKrXehCyGau+f8\nNe9rrCts5f0thzTMD55hjUhB4D+peZravXqYdT3OFm8zMC+gEt4lstI0fQKBgDQn\nT8fTJ7evJIcqg3LrqjSuJ5czV91oNd49hL91JdyM2wAGPwyQgvDleluV8nIWdtIO\nLgaTwofXm69WCXwxGpH6Ksq68LdKvtHzxvlwUqg4AxFdHGczwTwCAARETtc/WE/q\nLq7MRQUXDnkrgjZeygKlCBaKmInOVgM3AWiK7b2FAoGBAKUaRd4T+wlf354ounm1\ntOEWwIwEvwgTuvhHPVpQ9nOtiggrGEtJTVS3/+FA/mhAUej5w4WxgaB1AzV3uv47\nr2GyyeUeRy1YeBqauJ2ZSuKQZAuTvC974/Cv7R2gm/bQnTNYwvkhzdp4Giq6eqft\nLoxxo+xJgOrIqgdkaYSnH8zX\n-----END PRIVATE KEY-----\n",
+  "client_email": "read-only-dev@korean-discord-vocab-sheets.iam.gserviceaccount.com",
+  "client_id": "118248076065170840898",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/read-only-dev%40korean-discord-vocab-sheets.iam.gserviceaccount.com",
+  "spreadsheet_id": "1FUZJvBYiSfhN0zBe3h2FTjIfuyXTI_PDKlNOuVy_kO0"
+}
